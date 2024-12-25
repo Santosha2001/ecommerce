@@ -21,41 +21,50 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class AwsS3ServiceImpl {
 
-	private final String bucketName = "santosha-ecommerce";
+    @Value("${cloud.aws.s3.bucket-name}")
+    private String bucketName;
 
-	@Value("${aws.s3.access}")
-	private String awsS3AccessKey;
-	
-	@Value("${aws.s3.secrete}")
-	private String awsS3SecreteKey;
+    @Value("${cloud.aws.region.static}")
+    private String awsRegion;
 
-	public String saveImageToS3(MultipartFile photo) {
-		try {
-			String s3FileName = photo.getOriginalFilename();
-			// create aes credentials using the access and secrete key
-			BasicAWSCredentials awsCredentials = new BasicAWSCredentials(awsS3AccessKey, awsS3SecreteKey);
+    @Value("${aws.s3.access}")
+    private String awsS3AccessKey;
 
-			// create an s3 client with config credentials and region
-			AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
-					.withCredentials(new AWSStaticCredentialsProvider(awsCredentials)).withRegion(Regions.US_EAST_2)
-					.build();
+    @Value("${aws.s3.secrete}")
+    private String awsS3SecreteKey;
 
-			// get input stream from photo
-			InputStream inputStream = photo.getInputStream();
+    public String saveImageToS3(MultipartFile photo) {
+        try {
+            // Generate a unique S3 file name using the original file name
+            String s3FileName = photo.getOriginalFilename();
 
-			// set metedata for the onject
-			ObjectMetadata metadata = new ObjectMetadata();
-			metadata.setContentType("image/jpeg");
+            // Create AWS credentials using the access and secret keys
+            BasicAWSCredentials awsCredentials = new BasicAWSCredentials(awsS3AccessKey, awsS3SecreteKey);
 
-			// create a put request to upload the image to s3
-			PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, s3FileName, inputStream, metadata);
-			s3Client.putObject(putObjectRequest);
+            // Create an S3 client with the configured credentials and region
+            AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
+                    .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
+                    .withRegion(Regions.fromName(awsRegion)) // Use the correct region
+                    .build();
 
-			return "https://" + bucketName + ".s3.eu-north-1.amazonaws.com/" + s3FileName;
+            // Get the input stream from the uploaded photo
+            InputStream inputStream = photo.getInputStream();
 
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new RuntimeException("Unable to upload image to s3 bucket: " + e.getMessage());
-		}
-	}
+            // Set metadata for the uploaded object
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentType(photo.getContentType());
+            metadata.setContentLength(photo.getSize());
+
+            // Create a PUT request to upload the image to S3
+            PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, s3FileName, inputStream, metadata);
+            s3Client.putObject(putObjectRequest);
+
+            // Return the URL of the uploaded file in S3
+            return "https://" + bucketName + ".s3." + awsRegion + ".amazonaws.com/" + s3FileName;
+
+        } catch (IOException e) {
+            log.error("Error uploading image to S3 bucket: {}", e.getMessage(), e);
+            throw new RuntimeException("Unable to upload image to S3 bucket: " + e.getMessage());
+        }
+    }
 }
