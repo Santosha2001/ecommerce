@@ -19,7 +19,7 @@ public class AddressController {
 
 	private final AddressService addressService;
 
-	@PostMapping("/save")
+	@PostMapping("/saveAddress")
 	public ResponseEntity<Response> saveAndUpdateAddress(@RequestBody AddressDto addressDto) {
 		return ResponseEntity.ok(addressService.saveAndUpdateAddress(addressDto));
 	}

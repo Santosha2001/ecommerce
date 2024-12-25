@@ -24,13 +24,13 @@ public class CategoryController {
 
 	private final CategoryService categoryService;
 
-	@PostMapping("/create")
+	@PostMapping("/createCategory")
 	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<Response> createCategory(@RequestBody CategoryDto categoryDto) {
 		return ResponseEntity.ok(categoryService.createCategory(categoryDto));
 	}
 
-	@GetMapping("/get-all")
+	@GetMapping("/getAllCategories")
 	public ResponseEntity<Response> getAllCategories() {
 		return ResponseEntity.ok(categoryService.getAllCategories());
 	}
@@ -48,7 +48,7 @@ public class CategoryController {
 		return ResponseEntity.ok(categoryService.deleteCategory(categoryId));
 	}
 
-	@GetMapping("/get-category-by-id/{categoryId}")
+	@GetMapping("/getCategoryById/{categoryId}")
 	public ResponseEntity<Response> getCategoryById(@PathVariable Long categoryId) {
 		return ResponseEntity.ok(categoryService.getCategoryById(categoryId));
 	}

@@ -27,7 +27,7 @@ public class ProductController {
 
 	private final ProductService productService;
 
-	@PostMapping("/create")
+	@PostMapping("/createProduct")
 	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<Response> createProduct(@RequestParam Long categoryId, @RequestParam MultipartFile image,
 			@RequestParam String name, @RequestParam String description, @RequestParam BigDecimal price) {
@@ -53,22 +53,22 @@ public class ProductController {
 
 	}
 
-	@GetMapping("/get-by-product-id/{productId}")
+	@GetMapping("/getProductById/{productId}")
 	public ResponseEntity<Response> getProductById(@PathVariable Long productId) {
 		return ResponseEntity.ok(productService.getProductById(productId));
 	}
 
-	@GetMapping("/get-all")
+	@GetMapping("/getAllProducts")
 	public ResponseEntity<Response> getAllProducts() {
 		return ResponseEntity.ok(productService.getAllProducts());
 	}
 
-	@GetMapping("/get-by-category-id/{categoryId}")
+	@GetMapping("/getProductByCategoryId/{categoryId}")
 	public ResponseEntity<Response> getProductsByCategory(@PathVariable Long categoryId) {
 		return ResponseEntity.ok(productService.getProductsByCategory(categoryId));
 	}
 
-	@GetMapping("/search")
+	@GetMapping("/searchProduct")
 	public ResponseEntity<Response> searchForProduct(@RequestParam String searchValue) {
 		return ResponseEntity.ok(productService.searchProduct(searchValue));
 	}
