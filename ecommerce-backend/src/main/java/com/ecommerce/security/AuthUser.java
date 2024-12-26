@@ -18,6 +18,17 @@ public class AuthUser implements UserDetails {
 
 	private User user;
 
+	/**
+	 * Returns the authorities granted to the user for authentication and
+	 * authorization purposes.
+	 * 
+	 * This method is used by Spring Security to retrieve the roles or permissions
+	 * assigned to the user. In this implementation, the user's role is mapped to a
+	 * SimpleGrantedAuthority, which Spring Security uses to manage access control.
+	 * 
+	 * @return A collection of GrantedAuthority objects representing the user's
+	 *         roles or permissions.
+	 */
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 
@@ -26,25 +37,21 @@ public class AuthUser implements UserDetails {
 
 	@Override
 	public String getPassword() {
-
 		return user.getPassword();
 	}
 
 	@Override
 	public String getUsername() {
-
 		return user.getEmail();
 	}
 
 	@Override
 	public boolean isAccountNonExpired() {
-
 		return true;
 	}
 
 	@Override
 	public boolean isAccountNonLocked() {
-
 		return true;
 	}
 
@@ -55,7 +62,6 @@ public class AuthUser implements UserDetails {
 
 	@Override
 	public boolean isCredentialsNonExpired() {
-
 		return true;
 	}
 

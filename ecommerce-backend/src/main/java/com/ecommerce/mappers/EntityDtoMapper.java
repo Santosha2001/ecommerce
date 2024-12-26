@@ -18,7 +18,12 @@ import com.ecommerce.entities.User;
 @Component
 public class EntityDtoMapper {
 
-	// user entity to user DTO
+	/**
+	 * Maps a User entity to a UserDto with basic fields.
+	 * 
+	 * @param user The User entity to map.
+	 * @return The mapped UserDto.
+	 */
 	public UserDto mapUserToDtoBasic(User user) {
 		UserDto userDto = new UserDto();
 		userDto.setId(user.getId());
@@ -30,7 +35,12 @@ public class EntityDtoMapper {
 		return userDto;
 	}
 
-	// Address to DTO Basic
+	/**
+	 * Maps an Address entity to an AddressDto with basic fields.
+	 * 
+	 * @param address The Address entity to map.
+	 * @return The mapped AddressDto.
+	 */
 	public AddressDto mapAddressToDtoBasic(Address address) {
 		AddressDto addressDto = new AddressDto();
 		addressDto.setId(address.getId());
@@ -43,7 +53,12 @@ public class EntityDtoMapper {
 		return addressDto;
 	}
 
-	// Category to DTO basic
+	/**
+	 * Maps a Category entity to a CategoryDto with basic fields.
+	 * 
+	 * @param category The Category entity to map.
+	 * @return The mapped CategoryDto.
+	 */
 	public CategoryDto mapCategoryToDtoBasic(Category category) {
 		CategoryDto categoryDto = new CategoryDto();
 		categoryDto.setId(category.getId());
@@ -52,7 +67,12 @@ public class EntityDtoMapper {
 		return categoryDto;
 	}
 
-	// OrderItem to DTO Basics
+	/**
+	 * Maps an OrderItem entity to an OrderItemDto with basic fields.
+	 * 
+	 * @param orderItem The OrderItem entity to map.
+	 * @return The mapped OrderItemDto.
+	 */
 	public OrderItemDto mapOrderItemToDtoBasic(OrderItem orderItem) {
 		OrderItemDto orderItemDto = new OrderItemDto();
 		orderItemDto.setId(orderItem.getId());
@@ -64,7 +84,12 @@ public class EntityDtoMapper {
 		return orderItemDto;
 	}
 
-	// Product to DTO Basic
+	/**
+	 * Maps a Product entity to a ProductDto with basic fields.
+	 * 
+	 * @param product The Product entity to map.
+	 * @return The mapped ProductDto.
+	 */
 	public ProductDto mapProductToDtoBasic(Product product) {
 		ProductDto productDto = new ProductDto();
 		productDto.setId(product.getId());
@@ -76,12 +101,16 @@ public class EntityDtoMapper {
 		return productDto;
 	}
 
+	/**
+	 * Maps a User entity to a UserDto, including basic fields and address.
+	 * 
+	 * @param user The User entity to map.
+	 * @return The mapped UserDto with address.
+	 */
 	public UserDto mapUserToDtoPlusAddress(User user) {
 
-		System.out.println("mapUserToDtoPlusAddress is called");
 		UserDto userDto = mapUserToDtoBasic(user);
 		if (user.getAddress() != null) {
-
 			AddressDto addressDto = mapAddressToDtoBasic(user.getAddress());
 			userDto.setAddress(addressDto);
 		}
@@ -89,10 +118,15 @@ public class EntityDtoMapper {
 		return userDto;
 	}
 
-	// orderItem to DTO plus product
+	/**
+	 * Maps an OrderItem entity to an OrderItemDto, including basic fields and
+	 * product details.
+	 * 
+	 * @param orderItem The OrderItem entity to map.
+	 * @return The mapped OrderItemDto with product details.
+	 */
 	public OrderItemDto mapOrderItemToDtoPlusProduct(OrderItem orderItem) {
 		OrderItemDto orderItemDto = mapOrderItemToDtoBasic(orderItem);
-
 		if (orderItem.getProduct() != null) {
 			ProductDto productDto = mapProductToDtoBasic(orderItem.getProduct());
 			orderItemDto.setProduct(productDto);
@@ -101,10 +135,15 @@ public class EntityDtoMapper {
 		return orderItemDto;
 	}
 
-	// OrderItem to DTO plus product and user
+	/**
+	 * Maps an OrderItem entity to an OrderItemDto, including product and user
+	 * details.
+	 * 
+	 * @param orderItem The OrderItem entity to map.
+	 * @return The mapped OrderItemDto with product and user details.
+	 */
 	public OrderItemDto mapOrderItemToDtoPlusProductAndUser(OrderItem orderItem) {
 		OrderItemDto orderItemDto = mapOrderItemToDtoPlusProduct(orderItem);
-
 		if (orderItem.getUser() != null) {
 			UserDto userDto = mapUserToDtoPlusAddress(orderItem.getUser());
 			orderItemDto.setUser(userDto);
@@ -113,13 +152,16 @@ public class EntityDtoMapper {
 		return orderItemDto;
 	}
 
-	// USer to DTO with Address and Order Items History
+	/**
+	 * Maps a User entity to a UserDto, including address and order item history.
+	 * 
+	 * @param user The User entity to map.
+	 * @return The mapped UserDto with address and order history.
+	 */
 	public UserDto mapUserToDtoPlusAddressAndOrderHistory(User user) {
 		UserDto userDto = mapUserToDtoPlusAddress(user);
-
 		if (user.getOrderItemList() != null && !user.getOrderItemList().isEmpty()) {
-			userDto.setOrderItemList(user.getOrderItemList()
-					.stream()
+			userDto.setOrderItemList(user.getOrderItemList().stream()
 					.map(this::mapOrderItemToDtoPlusProduct)
 					.collect(Collectors.toList()));
 		}
