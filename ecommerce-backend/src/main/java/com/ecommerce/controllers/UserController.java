@@ -18,12 +18,23 @@ public class UserController {
 
 	private final UserService userService;
 
+	/**
+     * This endpoint handles the GET request to retrieve all users.
+     * Only users with 'ADMIN' authority can access this method.
+     * 
+     * @return ResponseEntity<Response> A response entity containing the list of all users.
+     */
 	@GetMapping("/getAllUsers")
 	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<Response> getAllUsers() {
 		return ResponseEntity.ok(userService.getAllUsers());
 	}
 
+	/**
+     * This endpoint handles the GET request to retrieve the logged-in user's information and order history.
+     * 
+     * @return ResponseEntity<Response> A response entity containing the logged-in user's information and order history.
+     */
 	@GetMapping("/loggedInUserInfo")
 	public ResponseEntity<Response> getUserInfoAndOrderHistory() {
 		return ResponseEntity.ok(userService.getUserInfoAndOrderHistory());
