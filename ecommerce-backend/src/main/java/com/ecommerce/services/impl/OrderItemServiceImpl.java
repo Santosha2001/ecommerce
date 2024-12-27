@@ -41,13 +41,19 @@ public class OrderItemServiceImpl implements OrderItemService {
 	private final UserService userService;
 	private final EntityDtoMapper entityDtoMapper;
 
+	/**
+	 * Places an order for the logged-in user based on the provided order request.
+	 *
+	 * @param orderRequest The details of the order to be placed.
+	 * @return A Response indicating the status of the operation.
+	 */
 	@Override
 	public Response placeOrder(OrderRequest orderRequest) {
 
 		User user = userService.getLoginUser();
-		// map order request items to order entities
 
 		List<OrderItem> orderItems = orderRequest.getItems().stream().map(orderItemRequest -> {
+
 			Product product = productRepo.findById(orderItemRequest.getProductId())
 					.orElseThrow(() -> new NotFoundException("Product Not Found"));
 
@@ -55,9 +61,9 @@ public class OrderItemServiceImpl implements OrderItemService {
 			orderItem.setProduct(product);
 			orderItem.setQuantity(orderItemRequest.getQuantity());
 			orderItem.setPrice(product
-					.getPrice()
-					.multiply(BigDecimal.valueOf(orderItemRequest.getQuantity()))); // set price,according to the quantity
-																													 
+								.getPrice()
+								.multiply(BigDecimal.valueOf(orderItemRequest.getQuantity())));
+
 			orderItem.setStatus(OrderStatus.PENDING);
 			orderItem.setUser(user);
 
@@ -67,8 +73,9 @@ public class OrderItemServiceImpl implements OrderItemService {
 
 		// calculate the total price
 		BigDecimal totalPrice = orderRequest.getTotalPrice() != null
-				&& orderRequest.getTotalPrice().compareTo(BigDecimal.ZERO) > 0 ? orderRequest.getTotalPrice()
-						: orderItems.stream().map(OrderItem::getPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+				&& orderRequest.getTotalPrice().compareTo(BigDecimal.ZERO) > 0 ? 
+						orderRequest.getTotalPrice() : 
+							orderItems.stream().map(OrderItem::getPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
 
 		// create order entity
 		Order order = new Order();
@@ -81,23 +88,47 @@ public class OrderItemServiceImpl implements OrderItemService {
 		orderRepo.save(order);
 
 		return Response.builder().status(200).message("Order was successfully placed").build();
-
 	}
 
+	/**
+	 * Updates the status of an order item by its ID.
+	 *
+	 * @param orderItemId The ID of the order item to update.
+	 * @param status      The new status to be assigned.
+	 * @return A Response indicating the status of the operation.
+	 */
 	@Override
 	public Response updateOrderItemStatus(Long orderItemId, String status) {
+		
 		OrderItem orderItem = orderItemRepo.findById(orderItemId)
 				.orElseThrow(() -> new NotFoundException("Order Item not found"));
 
 		orderItem.setStatus(OrderStatus.valueOf(status.toUpperCase()));
 		orderItemRepo.save(orderItem);
-		return Response.builder().status(200).message("Order status updated successfully").build();
+		
+		return Response
+				.builder()
+				.status(200)
+				.message("Order status updated successfully")
+				.build();
 	}
 
+	/**
+	 * Filters order items based on the provided criteria.
+	 *
+	 * @param status    The order status to filter by.
+	 * @param startDate The start date for the filter.
+	 * @param endDate   The end date for the filter.
+	 * @param itemId    The ID of the order item to filter by.
+	 * @param pageable  The pagination details.
+	 * @return A Response containing the filtered order items.
+	 */
 	@Override
 	public Response filterOrderItems(OrderStatus status, LocalDateTime startDate, LocalDateTime endDate, Long itemId,
 			Pageable pageable) {
-		Specification<OrderItem> spec = Specification.where(OrderItemSpecification.hasStatus(status))
+		
+		Specification<OrderItem> spec = Specification
+				.where(OrderItemSpecification.hasStatus(status))
 				.and(OrderItemSpecification.createdBetween(startDate, endDate))
 				.and(OrderItemSpecification.hasItemId(itemId));
 
@@ -106,11 +137,17 @@ public class OrderItemServiceImpl implements OrderItemService {
 		if (orderItemPage.isEmpty()) {
 			throw new NotFoundException("No Order Found");
 		}
+		
 		List<OrderItemDto> orderItemDtos = orderItemPage.getContent().stream()
-				.map(entityDtoMapper::mapOrderItemToDtoPlusProductAndUser).collect(Collectors.toList());
+				.map(entityDtoMapper::mapOrderItemToDtoPlusProductAndUser)
+				.collect(Collectors.toList());
 
-		return Response.builder().status(200).orderItemList(orderItemDtos).totalPage(orderItemPage.getTotalPages())
-				.totalElement(orderItemPage.getTotalElements()).build();
+		return Response
+				.builder()
+				.status(200)
+				.orderItemList(orderItemDtos)
+				.totalPage(orderItemPage.getTotalPages())
+				.totalElement(orderItemPage.getTotalElements())
+				.build();
 	}
-
 }

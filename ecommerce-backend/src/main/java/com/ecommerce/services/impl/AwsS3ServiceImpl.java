@@ -21,50 +21,58 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class AwsS3ServiceImpl {
 
-    @Value("${cloud.aws.s3.bucket-name}")
-    private String bucketName;
+	@Value("${cloud.aws.s3.bucket-name}")
+	private String bucketName; // Name of the S3 bucket
 
-    @Value("${cloud.aws.region.static}")
-    private String awsRegion;
+	@Value("${cloud.aws.region.static}")
+	private String awsRegion; // AWS region where the S3 bucket is located
 
-    @Value("${aws.s3.access}")
-    private String awsS3AccessKey;
+	@Value("${aws.s3.access}")
+	private String awsS3AccessKey; // AWS access key for authentication
 
-    @Value("${aws.s3.secrete}")
-    private String awsS3SecreteKey;
+	@Value("${aws.s3.secrete}")
+	private String awsS3SecreteKey; // AWS secret key for authentication
 
-    public String saveImageToS3(MultipartFile photo) {
-        try {
-            // Generate a unique S3 file name using the original file name
-            String s3FileName = photo.getOriginalFilename();
+	/**
+	 * Uploads an image file to the configured S3 bucket.
+	 * 
+	 * @param photo The image file to upload.
+	 * @return The public URL of the uploaded image.
+	 * @throws RuntimeException If an error occurs during the upload process.
+	 */
+	public String saveImageToS3(MultipartFile photo) {
+		try {
+			// Generate a unique S3 file name using the original file name
+			String s3FileName = photo.getOriginalFilename();
 
-            // Create AWS credentials using the access and secret keys
-            BasicAWSCredentials awsCredentials = new BasicAWSCredentials(awsS3AccessKey, awsS3SecreteKey);
+			// Create AWS credentials using the access and secret keys
+			BasicAWSCredentials awsCredentials = new BasicAWSCredentials(awsS3AccessKey, awsS3SecreteKey);
 
-            // Create an S3 client with the configured credentials and region
-            AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
-                    .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
-                    .withRegion(Regions.fromName(awsRegion)) // Use the correct region
-                    .build();
+			// Create an S3 client with the configured credentials and region
+			AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
+					.withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
+					.withRegion(Regions.fromName(awsRegion)) // Use the correct region
+					.build();
 
-            // Get the input stream from the uploaded photo
-            InputStream inputStream = photo.getInputStream();
+			// Get the input stream from the uploaded photo
+			InputStream inputStream = photo.getInputStream();
 
-            // Set metadata for the uploaded object
-            ObjectMetadata metadata = new ObjectMetadata();
-            metadata.setContentType(photo.getContentType());
-            metadata.setContentLength(photo.getSize());
+			// Set metadata for the uploaded object
+			ObjectMetadata metadata = new ObjectMetadata();
+			
+			metadata.setContentType(photo.getContentType());
+			metadata.setContentLength(photo.getSize());
 
-            // Create a PUT request to upload the image to S3
-            PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, s3FileName, inputStream, metadata);
-            s3Client.putObject(putObjectRequest);
+			// Create a PUT request to upload the image to S3
+			PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, s3FileName, inputStream, metadata);
+			s3Client.putObject(putObjectRequest);
 
-            // Return the URL of the uploaded file in S3
-            return "https://" + bucketName + ".s3." + awsRegion + ".amazonaws.com/" + s3FileName;
+			// Return the URL of the uploaded file in S3
+			return "https://" + bucketName + ".s3." + awsRegion + ".amazonaws.com/" + s3FileName;
 
-        } catch (IOException e) {
-            log.error("Error uploading image to S3 bucket: {}", e.getMessage(), e);
-            throw new RuntimeException("Unable to upload image to S3 bucket: " + e.getMessage());
-        }
-    }
+		} catch (IOException e) {
+			log.error("Error uploading image to S3 bucket: {}", e.getMessage(), e);
+			throw new RuntimeException("Unable to upload image to S3 bucket: " + e.getMessage());
+		}
+	}
 }
