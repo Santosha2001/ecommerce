@@ -21,4 +21,18 @@ class ApiService {
         return response.data;
     }
 
+    /** LOGIN */
+    static async loginUser(login) {
+        const response = await axios.post(`${this.BASE_URL}/auth/login`, login);
+        return response.data;
+    }
+
+    /** GET LOGGEDIN USER DETAILS */
+    static async loggedinUserDetails() {
+        const response = await axios.post(`${this.BASE_URL}/user/loggedInUserInfo`,
+            { headers: this.getHeader() }
+        );
+        return response.data;
+    }
+
 } export default ApiService;
