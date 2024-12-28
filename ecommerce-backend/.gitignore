@@ -5,7 +5,7 @@ target/
 !**/src/test/**/target/
 
 src/main/resources/application.properties
-src/main/resources/META-INF/*
+src/main/resources/META-INF/additional-spring-configuration-metadata.json
 
 ### STS ###
 .apt_generated
