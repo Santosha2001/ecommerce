@@ -28,7 +28,7 @@ class ApiService {
     }
 
     /** GET LOGGEDIN USER DETAILS */
-    static async loggedinUserDetails() {
+    static async getLoggedInUserInfo() {
         const response = await axios.post(`${this.BASE_URL}/user/loggedInUserInfo`,
             { headers: this.getHeader() }
         );
@@ -37,7 +37,7 @@ class ApiService {
 
     /** PRODUCT ENDPOINTS */
 
-    /** CCREATE PRODUCT */
+    /** CREATE PRODUCT */
     static async addProduct(formData) {
         const response = await axios.post(`${this.BASE_URL}/product/createProduct`, formData, {
             headers: {
@@ -65,20 +65,28 @@ class ApiService {
         return response.data;
     }
 
+    /** SEARCH PRODUCT */
+    static async searchProducts(searchValue) {
+        const response = await axios.get(`${this.BASE_URL}/product/search`, {
+            params: { searchValue }
+        });
+        return response.data;
+    }
+
     /** GET PRODUCT BY PRODUCT ID */
-    static async getProductByProductId(productid) {
+    static async getProductById(productid) {
         const response = await axios.get(`${this.BASE_URL}/product/getProductById/${productid}`);
         return response.data;
     }
 
     /** GET PRODUCT BY CATEGORY ID */
-    static async getProductsByCategoryId(categoryId) {
+    static async getAllProductsByCategoryId(categoryId) {
         const response = await axios.get(`${this.BASE_URL}/product/getProductByCategoryId/${categoryId}`);
         return response.data;
     }
 
     /** GET PRODUCT BY ID */
-    static async deleteProductsById(productId) {
+    static async deleteProduct(productId) {
         const response = await axios.get(`${this.BASE_URL}/product/delete/${productId}`, {
             headers: this.getHeader()
         });
@@ -96,21 +104,21 @@ class ApiService {
     /** CATEGORY ENDPOINTS */
 
     /** CCREATE CATEGORY */
-    static async addCategory(formData) {
-        const response = await axios.post(`${this.BASE_URL}/category/createCategory`, formData, {
+    static async createCategory(body) {
+        const response = await axios.post(`${this.BASE_URL}/category/createCategory`, body, {
             headers: this.getHeader()
         });
         return response.data;
     }
 
     /** GET ALL CATEGORIES */
-    static async getAllCategories() {
+    static async getAllCategory() {
         const response = await axios.get(`${this.BASE_URL}/category/getAllCategories`);
         return response.data;
     }
 
     /** UPDATE CATEGORY BY ID */
-    static async updateCategoryById(categoryId, body) {
+    static async updateCategory(categoryId, body) {
         const response = await axios.put(`${this.BASE_URL}/category/update/${categoryId}`, body);
         return response.data;
     }
@@ -122,7 +130,7 @@ class ApiService {
     }
 
     /** DELETE CATEGORY BY ID */
-    static async deleteCategoryById(categoryId) {
+    static async deleteCategory(categoryId) {
         const response = await axios.delete(`${this.BASE_URL}/category/delete/${categoryId}`, {
             headers: this.getHeader()
         });
@@ -148,28 +156,28 @@ class ApiService {
     }
 
     /** GET ORDER ITEM BY ID */
-    static async getOrderItemsById(orderItem) {
+    static async getOrderItemById(itemId) {
         const response = await axios.get(`${this.BASE_URL}/order/filter`, {
             headers: this.getHeader(),
-            params: { orderItem }
+            params: { itemId }
         });
         return response.data;
     }
 
     /** GET ORDER ITEMS BY STATUS */
-    static async getOrderItemsByStatus(orderStatus) {
+    static async getAllOrderItemsByStatus(status) {
         const response = await axios.get(`${this.BASE_URL}/order/filter`, {
             headers: this.getHeader(),
-            params: { orderStatus }
+            params: { status }
         });
         return response.data;
     }
 
     /** GET ORDER STATUS BY ORDER ID */
-    static async getOrderItemsByStatus(orderStatus, orderId) {
-        const response = await axios.put(`${this.BASE_URL}/order/updateItemStatus/${orderId}`, {}, {
+    static async updateOrderitemStatus(orderItemId, status) {
+        const response = await axios.put(`${this.BASE_URL}/order/updateItemStatus/${orderItemId}`, {}, {
             headers: this.getHeader(),
-            params: { orderStatus }
+            params: { status }
         });
         return response.data;
     }
